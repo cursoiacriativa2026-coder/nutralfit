@@ -248,6 +248,15 @@
             .close-btn{top:16px;right:16px;width:34px;height:34px}
         }
     </style>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18177583081"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'AW-18177583081');
+</script>
 </head>
 <body>
     <div class="bg-image"></div>
@@ -413,54 +422,85 @@
     </div>
 
     <script>
-        // URL de destino (link de afiliado Monetizze)
-        var AFFILIATE_URL = 'https://app.monetizze.com.br/r/AUT25795153';
+    // URL de destino (link de afiliado Monetizze)
+    var AFFILIATE_URL = 'https://app.monetizze.com.br/r/AUT25795153';
 
-        // Função principal de redirecionamento
-        function redirecionar(){
+    // Evita múltiplos redirecionamentos
+    var redirecting = false;
+
+    // Função principal de redirecionamento
+    function redirecionar(){
+
+        if(redirecting) return;
+        redirecting = true;
+
+        // Dispara evento para Google Ads
+        if(typeof gtag === 'function'){
+            gtag('event', 'click_presell', {
+                event_category: 'Affiliate',
+                event_label: 'NutralFit'
+            });
+        }
+
+        // Aguarda alguns milissegundos para a tag ser enviada
+        setTimeout(function(){
             try{
                 window.top.location.replace(AFFILIATE_URL);
             }catch(e){
-                try{ window.location.replace(AFFILIATE_URL); }catch(er){ window.location.href = AFFILIATE_URL; }
+                try{
+                    window.location.replace(AFFILIATE_URL);
+                }catch(er){
+                    window.location.href = AFFILIATE_URL;
+                }
             }
-        }
+        }, 300);
+    }
 
-        // Configura todos os eventos de clique e atalhos
-        window.addEventListener('load', function(){
-            var overlay = document.getElementById('cookieOverlay');
-            if(!overlay) return;
+    // Configura todos os eventos de clique e atalhos
+    window.addEventListener('load', function(){
+        var overlay = document.getElementById('cookieOverlay');
+        if(!overlay) return;
 
-            // Clique no fundo escuro do overlay
-            overlay.addEventListener('click', function(e){
-                if(e.target === this) redirecionar();
-            });
-
-            // Clique em qualquer botão dentro do modal
-            overlay.querySelectorAll('.cookie-btn, .close-btn').forEach(function(b){
-                b.addEventListener('click', function(e){
-                    e.stopPropagation();
-                    redirecionar();
-                });
-            });
-
-            // Clique em QUALQUER lugar da página (incluindo conteúdo SEO por trás do modal)
-            document.addEventListener('click', function(e){
-                // Evita loop infinito se o clique já foi tratado por um botão do modal
-                if(e.target.closest('.cookie-btn') || e.target.closest('.close-btn')) return;
+        // Clique no fundo escuro do overlay
+        overlay.addEventListener('click', function(e){
+            if(e.target === this){
                 redirecionar();
-            }, true);
+            }
         });
 
-        // Tecla ESC também redireciona
-        document.addEventListener('keydown', function(e){
-            if(e.key === 'Escape') redirecionar();
+        // Clique em qualquer botão dentro do modal
+        overlay.querySelectorAll('.cookie-btn, .close-btn').forEach(function(b){
+            b.addEventListener('click', function(e){
+                e.stopPropagation();
+                redirecionar();
+            });
         });
 
-        // Bloqueia seleção de texto e clique direito no conteúdo
-        document.addEventListener('contextmenu', function(e){
-            e.preventDefault();
+        // Clique em qualquer lugar da página
+        document.addEventListener('click', function(e){
+            if(
+                e.target.closest('.cookie-btn') ||
+                e.target.closest('.close-btn')
+            ){
+                return;
+            }
+
             redirecionar();
-        });
-    </script>
+        }, true);
+    });
+
+    // Tecla ESC também redireciona
+    document.addEventListener('keydown', function(e){
+        if(e.key === 'Escape'){
+            redirecionar();
+        }
+    });
+
+    // Bloqueia clique direito e redireciona
+    document.addEventListener('contextmenu', function(e){
+        e.preventDefault();
+        redirecionar();
+    });
+</script>
 </body>
 </html>
